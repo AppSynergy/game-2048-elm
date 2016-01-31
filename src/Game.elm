@@ -1,9 +1,11 @@
 module Game where
 
-import Tile exposing (Tile,Grid)
+import Rendering exposing (..)
+import Tile exposing (Tile, Grid)
 import Grid
+import Overlay
 
-import List.Extra exposing (transpose)
+import Graphics.Element as Element
 
 
 -- MODEL
@@ -17,7 +19,7 @@ type Progress
 type alias State =
   { grid: Grid
   , score: Int
-  , gameProgress: Progress
+  , progress: Progress
   }
 
 
@@ -25,7 +27,23 @@ default : State
 default =
   { grid = Tile.emptyGrid
   , score = 0
-  , gameProgress = InProgress
+  , progress = InProgress
   }
 
 -- UPDATE
+
+
+-- VIEW
+
+view : State -> Element.Element
+view state =
+  let overlayer =
+    case state.progress of
+      GameOver ->
+        applyOverlay Overlay.viewGameOver
+      Won ->
+        applyOverlay Overlay.viewWon
+      _ ->
+        identity
+  in
+  overlayer (Grid.draw state.grid (drawTiles state.grid) gridWidth)

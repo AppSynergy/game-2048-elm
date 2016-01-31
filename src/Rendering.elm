@@ -1,11 +1,10 @@
 module Rendering where
 
-import Game exposing (..)
 import Tile exposing (..)
 import Grid
 
-import Graphics.Element exposing (..)
-import Graphics.Collage exposing (..)
+import Graphics.Element as Element exposing (..)
+import Graphics.Collage as Draw
 import Color exposing (..)
 import Text exposing (..)
 
@@ -16,6 +15,9 @@ tileSize = 106.25
 
 tileMargin : Float
 tileMargin = 15
+
+gridWidth =
+  Grid.width tileSize tileMargin
 
 
 tileColor : Tile -> Color
@@ -32,7 +34,7 @@ tileColor tile =
     Number 512 -> rgb 237 200 80
     Number 1024 -> rgb 237 197 63
     Number 2048 -> rgb 237 194 46
-    _ -> rgba 238 228 218 0.35 -- empty tile
+    _ -> rgba 238 228 218 0.35
 
 
 tileTextColor : Tile -> Color
@@ -43,23 +45,24 @@ tileTextColor tile =
         (rgb 249 246 242)
       else
         (rgb 119 110 101)
-    _ -> black -- empty tile (??)
+    _ -> black
 
 
 tileTextSize : Tile -> Float
-tileTextSize tile = case tile of
-  Number 128 -> 45
-  Number 256 -> 45
-  Number 512 -> 45
-  Number 1024 -> 35
-  Number 2048 -> 35
-  otherwise -> 55
+tileTextSize tile =
+  case tile of
+    Number 128 -> 45
+    Number 256 -> 45
+    Number 512 -> 45
+    Number 1024 -> 35
+    Number 2048 -> 35
+    _ -> 55
 
 
 tileTextStyle : Tile -> Style
 tileTextStyle tile =
   { typeface = [ "Helvetica Neue", "Arial", "sans-serif" ]
-  , height = Just <| tileTextSize tile
+  , height = Just (tileTextSize tile)
   , color = tileTextColor tile
   , bold = True
   , italic = False
@@ -70,108 +73,45 @@ tileTextStyle tile =
 displayTile : Tile -> Element
 displayTile tile =
   let
-    tileBackground = filled (tileColor tile) <| square tileSize
-  in case tile of
-    Number n -> collage (round tileSize) (round tileSize)
-      [ tileBackground
-      , toForm (show n)
-      ]
-    Empty -> collage (round tileSize) (round tileSize)
-      [ tileBackground ]
+    tileSize' = round tileSize
+    tileBackground = Draw.square tileSize
+      |> Draw.filled (tileColor tile)
+    forms =
+      case tile of
+        Number n ->
+          [ tileBackground
+          , n
+            |> toString
+            |> Text.fromString
+            |> Text.style (tileTextStyle tile)
+            |> Element.centered
+            |> Draw.toForm
+          ]
+        Empty ->
+          [ tileBackground ]
+  in
+  Draw.collage tileSize' tileSize' forms
 
 
-displayTileAtCoordinates : (Tile, Int, Int) -> Form
+displayTileAtCoordinates : (Tile, Int, Int) -> Draw.Form
 displayTileAtCoordinates (t,i,j) =
   let position =
     ( (tileSize + tileMargin) * (toFloat i - (toFloat Grid.size - 1)/2)
     , (-1) * (tileSize + tileMargin) * (toFloat j - (toFloat Grid.size - 1)/2)
     )
   in
-  move position <| toForm <| displayTile t
+  Draw.move position <| Draw.toForm <| displayTile t
 
-
-gridWidth : Float
-gridWidth =
-  (toFloat Grid.size) * tileSize + (1 + toFloat Grid.size) * tileMargin
-
-
-displayGrid : Grid -> Element
-displayGrid g =
-  let
-    gridBox = filled (rgb 187 173 160) -- the grid background
-      <| square gridWidth
-    tiles = List.map displayTileAtCoordinates
-      <| Tile.withCoordinates g
-  in
-  collage (round gridWidth) (round gridWidth) ([gridBox] ++ tiles)
-
-
-displayOverlay : Style -> Color -> String ->  Element
-displayOverlay s c t =
-  collage (round gridWidth) (round gridWidth)
-    [
-      filled c <| square gridWidth -- background
-    , toForm (show t) -- message
-    ]
-
-
-gameOverOverlayStyle : Style
-gameOverOverlayStyle =
-  tileTextStyle <| Number 2
-
-
-wonOverlayStyle : Style
-wonOverlayStyle =
-  tileTextStyle <| Number 16
-
-
-gameOverOverlayColor : Color
-gameOverOverlayColor =
-  rgba 238 228 218 0.73
-
-
-wonOverlayColor : Color
-wonOverlayColor =
-  rgba 237 194 46 0.5
-
-
-gameOverMessage : String
-gameOverMessage =
-  "Game over!"
-
-
-wonMessage : String
-wonMessage =
-  "You won!"
-
-
-displayGameOverOverlay : Element
-displayGameOverOverlay =
-  displayOverlay gameOverOverlayStyle gameOverOverlayColor gameOverMessage
-
-
-displayWonOverlay : Element
-displayWonOverlay =
-  displayOverlay wonOverlayStyle wonOverlayColor wonMessage
 
 
 applyOverlay : Element -> Element -> Element
 applyOverlay overlay grid =
-  collage (round gridWidth) (round gridWidth)
-    [ toForm <| grid
-    , toForm <| overlay
+  Draw.collage (round gridWidth) (round gridWidth)
+    [ Draw.toForm <| grid
+    , Draw.toForm <| overlay
     ]
 
 
-display : Game.State -> Element
-display state =
-  let overlayer =
-    case state.gameProgress of
-      GameOver ->
-        applyOverlay displayGameOverOverlay
-      Won ->
-        applyOverlay displayWonOverlay
-      _ ->
-        identity
-  in
-  overlayer (displayGrid state.grid)
+drawTiles grid =
+  Tile.withCoordinates grid
+    |> List.map displayTileAtCoordinates

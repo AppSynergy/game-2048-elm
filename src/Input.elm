@@ -1,34 +1,24 @@
-{--
-Copyright (c) 2014 Josh Kirklin
-This source is subject to the MIT License.
-Please see the LICENSE file for more information.
-All other rights reserved.
---}
-
-module InputModel where
+module Input where
 
 import Keyboard
 import Random
 
 
--- the direction to shift the grid
 type Direction = Up | Down | Left | Right | None
 
 
 type alias Controls =
-  { tilePushDirection: Direction
-  , newGameButtonPressed: Bool
+  { push: Direction
+  , newGame: Bool
   }
 
 
--- define the inputs that the game will depend upon
 type alias Input =
   { controls: Controls
   , randomFloats: List Float
   }
 
 
--- make a signal that is the direction that the user has chosen.
 playerDirection : Signal Direction
 playerDirection =
   let toDirection ds  =
@@ -38,7 +28,6 @@ playerDirection =
     else if ds == { x=-1, y=0 } then Left
     else None
   in
-  -- with both the wasd and arrow keys
   Signal.merge
     (Signal.map toDirection Keyboard.arrows)
     (Signal.map toDirection Keyboard.wasd)

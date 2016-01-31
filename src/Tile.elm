@@ -5,8 +5,11 @@ import List.Extra exposing (getAt)
 import Grid
 
 
-type Tile =
-  Number Int | Empty
+-- MODEL
+
+type Tile
+  = Number Int
+  | Empty
 
 
 type alias Grid
@@ -32,6 +35,8 @@ newTile x =
     (Number 4)
 
 
+-- UTILS
+
 toInt : Tile -> Int
 toInt t = case t of
     Number n -> n
@@ -43,6 +48,8 @@ fromInt n = case n of
     0 -> Empty
     _ -> Number n
 
+
+-- UPDATE
 
 set : (Int, Int) -> Grid -> Tile -> Grid
 set (i, j) g t =

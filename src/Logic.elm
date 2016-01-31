@@ -2,7 +2,7 @@ module Logic where
 
 import List.Extra exposing (getAt)
 
-import InputModel exposing (..)
+import Input exposing (..)
 import Game exposing (..)
 import Grid
 import Tile exposing (..)
@@ -73,7 +73,7 @@ slideGrid dir grid =
 slideGameState : Input -> Game.State -> Game.State
 slideGameState input state =
   let
-    newGridScore = slideGrid input.controls.tilePushDirection state.grid
+    newGridScore = slideGrid input.controls.push state.grid
   in
   if (fst newGridScore == state.grid) then
     state
@@ -111,14 +111,14 @@ gameWon g =
 lose : Game.State -> Game.State
 lose state =
   { state
-  | gameProgress = GameOver
+  | progress = GameOver
   }
 
 
 win : Game.State -> Game.State
 win state =
   { state
-  | gameProgress = Won
+  | progress = Won
   }
 
 
@@ -178,15 +178,15 @@ newGame input =
 
 stepGame : Input -> Game.State -> Game.State
 stepGame input state =
-    if input.controls.newGameButtonPressed then
+    if input.controls.newGame then
       newGame input
-    else if state.gameProgress /= InProgress then -- can probably go due to else
+    else if state.progress /= InProgress then -- can probably go due to else
       state
     else if gameWon state.grid then
       win state
     else if gameLost state.grid then
       lose state
-    else if input.controls.tilePushDirection /= None then
+    else if input.controls.push /= None then
       let
         pushedState = slideGameState input state
       in
