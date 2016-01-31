@@ -1,31 +1,30 @@
 module Elm2048 where
 
+import Graphics.Element as Ele
+
 import InputModel exposing (Input, Controls, playerDirection, randomFloats)
 import GameModel exposing (defaultGame, GameState)
 import Logic exposing (stepGame)
-import Rendering exposing (display)
+import Rendering
 
 
--- Outgoing Ports
+-- PORTS
 
 port score : Signal Int
 port score =
   Signal.map (\x -> x.score) gameState
 
 
--- Incoming Ports
-
 port newGameButton : Signal Bool
 
 
--- Signals
+-- SIGNALS
 
-controls =
-  Signal.map2 (\a b -> { newGameButtonPressed=b, tilePushDirection=a }) playerDirection newGameButton
-
-
+input : Signal Input
 input =
   let
+    controls =
+      Signal.map2 (\a b -> { newGameButtonPressed=b, tilePushDirection=a }) playerDirection newGameButton
     i = (\a b -> { controls=a, randomFloats=b })
   in
   Signal.map2 i controls (randomFloats controls)
@@ -36,5 +35,6 @@ gameState =
   Signal.foldp stepGame defaultGame input
 
 
+main : Signal Ele.Element
 main =
-  Signal.map display gameState
+  Signal.map Rendering.display gameState

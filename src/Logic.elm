@@ -3,9 +3,9 @@ module Logic where
 import List.Extra exposing (getAt)
 
 import InputModel exposing (..)
-
 import GameModel exposing (..)
-
+import Grid
+import Tile exposing (..)
 
 -- takes a list of values and 'slides' them to the left,
 -- joining in lists pairs of adjacent identical values.
@@ -17,7 +17,7 @@ groupedByTwo l =
     [x,y] ->
       if (x == y) then
         [[x,y]]
-      else 
+      else
         [[x],[y]]
     (x::y::xs) ->
       if (x == y) then
@@ -33,10 +33,10 @@ slideRow : List Tile -> (List Tile, Int)
 slideRow r = let grouped =
   groupedByTwo <| List.filter (\t -> t /= Empty) r
     in (
-        List.take gridSize
-        <| (List.map ( intToTile << List.sum << (List.map tileToInt)) grouped)
-            ++ List.repeat gridSize Empty
-      , List.sum << (List.map tileToInt)
+        List.take Grid.size
+        <| (List.map ( Tile.fromInt << List.sum << (List.map Tile.toInt)) grouped)
+            ++ List.repeat Grid.size Empty
+      , List.sum << (List.map Tile.toInt)
         <| List.concat
         <| List.filter (\x -> List.length x > 1) grouped
     )

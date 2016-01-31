@@ -1,6 +1,9 @@
 module Rendering where
 
 import GameModel exposing (..)
+import Tile exposing (..)
+import Grid
+
 import Graphics.Element exposing (..)
 import Graphics.Collage exposing (..)
 import Color exposing (..)
@@ -80,8 +83,8 @@ displayTile tile =
 displayTileAtCoordinates : (Tile, Int, Int) -> Form
 displayTileAtCoordinates (t,i,j) =
   let position =
-    ( (tileSize + tileMargin) * (toFloat i - (toFloat gridSize - 1)/2)
-    , (-1) * (tileSize + tileMargin) * (toFloat j - (toFloat gridSize - 1)/2)
+    ( (tileSize + tileMargin) * (toFloat i - (toFloat Grid.size - 1)/2)
+    , (-1) * (tileSize + tileMargin) * (toFloat j - (toFloat Grid.size - 1)/2)
     )
   in
   move position <| toForm <| displayTile t
@@ -89,7 +92,7 @@ displayTileAtCoordinates (t,i,j) =
 
 gridWidth : Float
 gridWidth =
-  (toFloat gridSize) * tileSize + (1 + toFloat gridSize) * tileMargin
+  (toFloat Grid.size) * tileSize + (1 + toFloat Grid.size) * tileMargin
 
 
 displayGrid : Grid -> Element
