@@ -29,11 +29,3 @@ fromInt : Int -> Tile
 fromInt n = case n of
     0 -> Empty
     _ -> Number n
-
-
-readTile : (Int, Int) -> Grid -> Tile
-readTile (i, j) grid =
-  let
-    row = Maybe.withDefault [] (getAt grid j)
-  in
-  Maybe.withDefault Empty (getAt row i)
