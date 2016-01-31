@@ -1,6 +1,6 @@
 module Rendering where
 
-import GameModel exposing (..)
+import Game exposing (..)
 import Tile exposing (..)
 import Grid
 
@@ -163,10 +163,10 @@ applyOverlay overlay grid =
     ]
 
 
-display : GameState -> Element
-display gameState =
+display : Game.State -> Element
+display state =
   let overlayer =
-    case gameState.gameProgress of
+    case state.gameProgress of
       GameOver ->
         applyOverlay displayGameOverOverlay
       Won ->
@@ -174,4 +174,4 @@ display gameState =
       _ ->
         identity
   in
-  overlayer (displayGrid gameState.grid)
+  overlayer (displayGrid state.grid)

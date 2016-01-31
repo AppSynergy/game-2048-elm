@@ -2,20 +2,34 @@ module Tile where
 
 import List.Extra exposing (getAt)
 
-import Grid exposing (Gridlike)
+import Grid
 
 
 type Tile =
   Number Int | Empty
 
+
 type alias Grid
-  = Gridlike Tile
+  = Grid.AbstractGrid Tile
+
 
 emptyGrid : Grid
 emptyGrid =
   Empty
     |> List.repeat Grid.size
     |> List.repeat Grid.size
+
+
+tile2Probability : Float
+tile2Probability = 0.9
+
+
+newTile : Float -> Tile
+newTile x =
+  if (x < tile2Probability) then
+    (Number 2)
+  else
+    (Number 4)
 
 
 toInt : Tile -> Int

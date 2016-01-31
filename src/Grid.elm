@@ -2,13 +2,17 @@ module Grid where
 
 import List.Extra exposing (transpose)
 
+
 size : Int
 size = 4
 
 
-type alias Gridlike a =
+-- This module does not care what `a` is.
+type alias AbstractGrid a =
   List (List a)
 
 
-rotate : Gridlike a -> Gridlike a
-rotate g = List.map List.reverse <| transpose g
+rotate : AbstractGrid a -> AbstractGrid a
+rotate grid =
+  transpose grid
+    |> List.map List.reverse

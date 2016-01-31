@@ -3,7 +3,7 @@ module Elm2048 where
 import Graphics.Element as Ele
 
 import InputModel exposing (Input, Controls, playerDirection, randomFloats)
-import GameModel exposing (defaultGame, GameState)
+import Game
 import Logic exposing (stepGame)
 import Rendering
 
@@ -30,9 +30,9 @@ input =
   Signal.map2 i controls (randomFloats controls)
 
 
-gameState : Signal GameState
+gameState : Signal Game.State
 gameState =
-  Signal.foldp stepGame defaultGame input
+  Signal.foldp stepGame Game.default input
 
 
 main : Signal Ele.Element

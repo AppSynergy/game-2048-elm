@@ -1,4 +1,4 @@
-module GameModel where
+module Game where
 
 import Tile exposing (Tile,Grid)
 import Grid
@@ -6,22 +6,26 @@ import Grid
 import List.Extra exposing (transpose)
 
 
+-- MODEL
+
 type Progress
   = InProgress
   | GameOver
   | Won
 
 
-type alias GameState =
+type alias State =
   { grid: Grid
   , score: Int
   , gameProgress: Progress
   }
 
 
-defaultGame : GameState
-defaultGame =
+default : State
+default =
   { grid = Tile.emptyGrid
   , score = 0
   , gameProgress = InProgress
   }
+
+-- UPDATE

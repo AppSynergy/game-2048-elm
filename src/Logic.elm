@@ -3,7 +3,7 @@ module Logic where
 import List.Extra exposing (getAt)
 
 import InputModel exposing (..)
-import GameModel exposing (..)
+import Game exposing (..)
 import Grid
 import Tile exposing (..)
 
@@ -70,17 +70,17 @@ slideGrid dir grid =
     in (slidGrid, scoreGained)
 
 
-slideGameState : Input -> GameState -> GameState
-slideGameState input gameState =
+slideGameState : Input -> Game.State -> Game.State
+slideGameState input state =
   let
-    newGridScore = slideGrid input.controls.tilePushDirection gameState.grid
+    newGridScore = slideGrid input.controls.tilePushDirection state.grid
   in
-  if (fst newGridScore == gameState.grid) then
-    gameState
+  if (fst newGridScore == state.grid) then
+    state
   else
-    { gameState
+    { state
     | grid = fst newGridScore
-    , score = gameState.score + snd newGridScore
+    , score = state.score + snd newGridScore
     }
 
 
@@ -108,30 +108,18 @@ gameWon g =
   0 /= (List.length <| List.filter (\t -> t == Number 2048) <| List.concat g)
 
 
-lose : GameState -> GameState
-lose gameState =
-  { gameState
+lose : Game.State -> Game.State
+lose state =
+  { state
   | gameProgress = GameOver
   }
 
 
-win : GameState -> GameState
-win gameState =
-  { gameState
+win : Game.State -> Game.State
+win state =
+  { state
   | gameProgress = Won
   }
-
-
-tile2Probability : Float
-tile2Probability = 0.9
-
-
-newTile : Float -> Tile
-newTile x =
-  if (x < tile2Probability) then
-    (Number 2)
-  else
-    (Number 4)
 
 
 -- a list of the coordinates of the empty tiles in a grid
@@ -159,23 +147,23 @@ newTileIndex x g =
            (floor <| (toFloat <| List.length emptyTileIndices) * x)))
 
 
-placeRandomTile : Float -> Float -> GameState -> GameState
-placeRandomTile float1 float2 gameState =
+placeRandomTile : Float -> Float -> Game.State -> Game.State
+placeRandomTile float1 float2 state =
     let
-      tileIndex = newTileIndex float1 gameState.grid
+      tileIndex = newTileIndex float1 state.grid
     in
     if (tileIndex == Nothing) then
-      gameState
+      state
     else
-      { gameState
+      { state
       | grid = Tile.set
         (Maybe.withDefault (0,0) tileIndex)
-        gameState.grid
+        state.grid
         (newTile float2)
       }
 
 
-newGame : Input -> GameState
+newGame : Input -> Game.State
 newGame input =
   let
     randoms = [0,1,2,3]
@@ -185,40 +173,29 @@ newGame input =
   in
     placeRandomTile i1 i2
  <| placeRandomTile i3 i4
- <| defaultGame
+ <| Game.default
 
 
-stepGame : Input -> GameState -> GameState
-stepGame input gameState =
+stepGame : Input -> Game.State -> Game.State
+stepGame input state =
     if input.controls.newGameButtonPressed then
-
       newGame input
-
-    else if gameState.gameProgress /= InProgress then
-
-      gameState
-
-    else if gameWon gameState.grid then
-
-      win gameState
-
-    else if gameLost gameState.grid then
-
-      lose gameState
-
+    else if state.gameProgress /= InProgress then -- can probably go due to else
+      state
+    else if gameWon state.grid then
+      win state
+    else if gameLost state.grid then
+      lose state
     else if input.controls.tilePushDirection /= None then
-
       let
-        pushedState = slideGameState input gameState
+        pushedState = slideGameState input state
       in
-      if (pushedState == gameState) then
-        gameState
+      if (pushedState == state) then
+        state
       else
         placeRandomTile
           (Maybe.withDefault 0 (getAt input.randomFloats 0))
           (Maybe.withDefault 0 (getAt input.randomFloats 1))
           pushedState
-
     else
-
-      gameState
+      state
