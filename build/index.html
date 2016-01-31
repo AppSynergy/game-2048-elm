@@ -6,7 +6,7 @@
         <style>
 body {
     background-color: #FAF8EF;
-    color: #776E65; 
+    color: #776E65;
     font-family: 'Clear Sans','Helvetica Neue',Arial,sans-serif;
 }
 
@@ -83,18 +83,23 @@ p#description {
         </div>
     </body>
     <script type="text/javascript">
-        document.addEventListener("keydown", function (e) { // Prevent arrow keys from scrolling page
+        document.addEventListener("keydown", function (e) {
+          // Prevent arrow keys from scrolling page
           if([37,38,39,40].indexOf(e.keyCode) > -1){
             e.preventDefault();
           }
         }, false);
 
-        var gameBoardDiv = document.getElementById('gameBoard'); // The placeholder div that will accept our elm component
-        var elm2048 = Elm.embed(Elm.Elm2048, gameBoardDiv, { newGameButton: false }); // Set up our elm component in the game board div
-                                                                                      // The new game button is not pressed by default
+        var gameBoardDiv = document.getElementById('gameBoard');
+          // The placeholder div that will accept our elm component
+        var elm2048 = Elm.embed(Elm.Elm2048, gameBoardDiv, { newGameButton: false });
+          // Set up our elm component in the game board div
+          // The new game button is not pressed by default (????)
 
-        elm2048.ports.score.subscribe(function (x) { // Every time the score port in the elm component changes:
-            document.getElementById('score').innerHTML=x; // modify the score displayed in the score box
+        elm2048.ports.score.subscribe(function (x) {
+          // Every time the score port in the elm component changes:
+          document.getElementById('score').innerHTML=x;
+          // modify the score displayed in the score box
         });
 
         function sendNewGame(a) { // A function to send the boolean status of the new game button to the elm component via its newGameButton port.

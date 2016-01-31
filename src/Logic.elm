@@ -7,16 +7,23 @@ import InputModel exposing (..)
 import GameModel exposing (..)
 
 
-(!) = getAt
-
 -- takes a list of values and 'slides' them to the left,
 -- joining in lists pairs of adjacent identical values.
 groupedByTwo : List a -> List (List a)
-groupedByTwo l = case l of
-    [x] -> [[x]]
-    [x,y] -> if (x == y) then [[x,y]] else [[x],[y]]
-    (x::y::xs) -> if (x == y) then ([x,y] :: (groupedByTwo xs))
-                    else ([x] :: (groupedByTwo (y::xs)))
+groupedByTwo l =
+  case l of
+    [x] ->
+      [[x]]
+    [x,y] ->
+      if (x == y) then
+        [[x,y]]
+      else 
+        [[x],[y]]
+    (x::y::xs) ->
+      if (x == y) then
+        ([x,y] :: (groupedByTwo xs))
+      else
+        ([x] :: (groupedByTwo (y::xs)))
     _ -> []
 
 
@@ -42,9 +49,9 @@ slideGrid dir grid =
   else
     let
       rotatedGrid = (case dir of
-        Down  -> rotateGrid
+        Down -> rotateGrid
         Right -> rotateGrid >> rotateGrid
-        Up    -> rotateGrid >> rotateGrid >> rotateGrid
+        Up -> rotateGrid >> rotateGrid >> rotateGrid
         otherwise -> identity)
         <| grid
 
@@ -54,25 +61,30 @@ slideGrid dir grid =
       scoreGained = List.sum <| List.map (snd) rowsWithScores
 
       slidGrid = (case dir of
-        Up  -> rotateGrid
+        Up -> rotateGrid
         Right -> rotateGrid >> rotateGrid
-        Down    -> rotateGrid >> rotateGrid >> rotateGrid
+        Down -> rotateGrid >> rotateGrid >> rotateGrid
         otherwise -> identity)
         <| slidRotatedGrid
 
     in (slidGrid, scoreGained)
 
+
 slideGameState : Input -> GameState -> GameState
 slideGameState input gameState =
-   let newGridScore = slideGrid input.controls.tilePushDirection gameState.grid
-    in if (fst newGridScore == gameState.grid) then gameState else
-        { gameState
-        | grid = fst newGridScore
-        , score = gameState.score + snd newGridScore
-        }
+  let
+    newGridScore = slideGrid input.controls.tilePushDirection gameState.grid
+  in
+  if (fst newGridScore == gameState.grid) then
+    gameState
+  else
+    { gameState
+    | grid = fst newGridScore
+    , score = gameState.score + snd newGridScore
+    }
 
 
--- check if none of the rows or columns of a grid can be slid in any direction
+-- If you can't slide, you've lost!
 gameLost : Grid -> Bool
 gameLost g =
     let
@@ -90,6 +102,7 @@ gameLost g =
       ]
 
 
+-- If you've made 2048, you've won!
 gameWon : Grid -> Bool
 gameWon g =
   0 /= (List.length <| List.filter (\t -> t == Number 2048) <| List.concat g)
@@ -109,25 +122,24 @@ win gameState =
   }
 
 
-{------------------------------------------------------------------------------
-                             Random tile placement
-------------------------------------------------------------------------------}
-
-tile2Probability : Float -- the probability that a new tile is a 2.
-                         -- equivalently, the probability that a new
-                         -- tile is a 4
+tile2Probability : Float
 tile2Probability = 0.9
 
-newTile : Float -> Tile -- based on a float that will be random,
-                        -- return a new tile
-newTile x = if (x < tile2Probability) then (Number 2) else (Number 4)
+
+newTile : Float -> Tile
+newTile x =
+  if (x < tile2Probability) then
+    (Number 2)
+  else
+    (Number 4)
 
 
 -- a list of the coordinates of the empty tiles in a grid
 emptyTiles : Grid -> List (Int, Int)
-emptyTiles g = List.map (\(_,i,j) -> (i,j))
-  <| List.filter (\(t,_,_) -> t == Empty)
-  <| tilesWithCoordinates g
+emptyTiles g =
+  List.map (\(_,i,j) -> (i,j))
+    <| List.filter (\(t,_,_) -> t == Empty)
+    <| tilesWithCoordinates g
 
 
 -- based on a float that will be random
