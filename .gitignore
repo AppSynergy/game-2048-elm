@@ -1,4 +1,5 @@
 build/
 elm-stuff/
-*.js
+node_modules/
+elm*.js
 *~
