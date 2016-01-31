@@ -1,90 +1,102 @@
 {--
-2048-elm
-
-GameModel.elm
-
 Copyright (c) 2014 Josh Kirklin
-
 This source is subject to the MIT License.
 Please see the LICENSE file for more information.
 All other rights reserved.
 --}
 
-{------------------------------------------------------------------------------
-
-                                Game Model
-
-------------------------------------------------------------------------------}
-
 module GameModel where
 
-import Utils ((!), transpose)
 
-data Tile = Number Int | Empty -- a tile can either contain an int, or be empty
-data Grid = Grid [[Tile]] -- a grid is a list of lists of tiles
+import List.Extra exposing (transpose, getAt)
 
-data Progress = InProgress | GameOver | Won -- a game can be in progress, 
-                                            -- at game over, or won
 
-type GameState = { -- defines the various properties of a game state:
-    grid: Grid              -- the grid of tiles
-  , score: Int              -- the score
-  , gameProgress: Progress  -- the progress of the game (in progress, 
-                            -- game over etc.)
-}
+(!) = getAt
+infixl 9 !
 
-gridSize : Int -- the length of the sides of the grid
+
+type Tile =
+  Number Int | Empty
+
+
+type alias Grid =
+  List (List Tile)
+
+
+type Progress =
+  InProgress | GameOver | Won
+
+
+type alias GameState =
+  { grid: Grid
+  , score: Int
+  , gameProgress: Progress
+  }
+
+
+gridSize : Int
 gridSize = 4
 
-{------------------------------------------------------------------------------
-                             Grid manipulation
-------------------------------------------------------------------------------}
 
-readTile : (Int, Int) -> Grid -> Tile -- the tile at (i,j) in a grid
-readTile (i, j) (Grid g) = (g ! j) ! i
+defaultGame : GameState
+defaultGame =
+  { grid = emptyGrid
+  , score = 0
+  , gameProgress = InProgress
+  }
 
-setTile : (Int, Int) -> Grid -> Tile -> Grid -- change the tile at (i,j) in 
-                                             -- a grid
-setTile (i, j) (Grid g) t = let 
-        r = g ! j -- jth row
-        nr = (take i r) ++ [t] ++ (drop (i+1) r) -- ith element changed in
-                                                 -- jth row
-    in Grid <| (take j g) ++ [nr] ++ (drop (j+1) g) -- new grid with modified 
-                                                    -- jth row
+
+emptyGrid : Grid
+emptyGrid =
+  List.repeat gridSize (List.repeat gridSize Empty)
+
+
+readTile : (Int, Int) -> Grid -> Tile
+readTile (i, j) grid =
+  let
+    row = Maybe.withDefault [] (getAt grid j)
+  in
+  Maybe.withDefault Empty (getAt row i)
+
+
+-- change (?, set?) the tile at (i,j) in a grid
+setTile : (Int, Int) -> Grid -> Tile -> Grid
+setTile (i, j) g t =
+    let
+      r = getAt g j -- jth row
+      nr = case r of
+        Just a ->
+          (List.take i (a)) ++ [t] ++ (List.drop (i+1) a)
+        Nothing ->
+          []
+        -- ith element changed in jth row
+    in
+    (List.take j g) ++ [nr] ++ (List.drop (j+1) g)
+      -- new grid with modified jth row
+
 
 tileToInt : Tile -> Int -- convert a tile to the int it represents
 tileToInt t = case t of
     Number n -> n
-    otherwise -> 0
+    _ -> 0
+
 
 intToTile : Int -> Tile -- convert an int to a tile representing it
 intToTile n = case n of
     0 -> Empty
-    otherwise -> Number n
-
-tilesWithCoordinates : Grid -> [(Tile,Int,Int)] -- a list of the tiles in a grid 
-                                                -- with their coordinates
-tilesWithCoordinates (Grid g) = concat
-                   <| zipWith (\j r -> map (\(t,i) -> (t,i,j)) r) 
-                        [0..(gridSize-1)] 
-                   <| map (\r -> zip r [0..(gridSize-1)]) 
-                   <| g
-
-rotateGrid : Grid -> Grid -- rotate a grid clockwise by 90 degrees 
-rotateGrid (Grid g) = Grid <| map reverse <| transpose g
-
-{------------------------------------------------------------------------------
-                             Initial gamestate
-------------------------------------------------------------------------------}
-
-emptyGrid : Grid -- a grid of empty tiles
-emptyGrid = Grid <| repeat gridSize <| repeat gridSize <| Empty
-
-defaultGame : GameState -- the default starting game state:
-defaultGame = { 
-    grid = emptyGrid            -- an empty grid
-  , score = 0                   -- initial score is zero
-  , gameProgress = InProgress   -- the game is in progress
-    }
+    _ -> Number n
 
 
+tilesWithCoordinates : Grid -> List (Tile,Int,Int)
+tilesWithCoordinates grid =
+  let
+    range = [0..(gridSize-1)]
+    flat = List.concat grid
+    xcoords = List.concat (List.repeat gridSize range)
+    ycoords = [0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3]
+  in
+  List.map3 (,,) flat xcoords ycoords
+
+
+rotateGrid : Grid -> Grid
+rotateGrid g = List.map List.reverse <| transpose g

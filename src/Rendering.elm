@@ -1,46 +1,28 @@
 {--
-2048-elm
-
-Rendering.elm
-
 Copyright (c) 2014 Josh Kirklin
-
 This source is subject to the MIT License.
 Please see the LICENSE file for more information.
 All other rights reserved.
 --}
 
-{------------------------------------------------------------------------------
-
-                                Rendering
-
-------------------------------------------------------------------------------}
-
 module Rendering where
 
-import GameModel (
-    Tile
-  , Number
-  , Empty
-  , Grid
-  , gridSize
-  , tilesWithCoordinates
-  , GameState
-  , GameOver
-  , Won
-  )
+import GameModel exposing (..)
+import Graphics.Element exposing (..)
+import Graphics.Collage exposing (..)
+import Color exposing (..)
+import Text exposing (..)
 
-{------------------------------------------------------------------------------
-                              Displaying a tile
-------------------------------------------------------------------------------}
 
-tileSize : Float -- the width of a tile
+tileSize : Float
 tileSize = 106.25
 
-tileMargin : Float -- the width of the gaps between tiles
+
+tileMargin : Float
 tileMargin = 15
 
-tileColor : Tile -> Color -- the color of a tile
+
+tileColor : Tile -> Color
 tileColor tile = case tile of
                   Number 2 -> rgb 238 228 218
                   Number 4 -> rgb 237 224 200
@@ -56,13 +38,13 @@ tileColor tile = case tile of
                   otherwise -> rgba 238 228 218 0.35 -- empty tile
 
 tileTextColor : Tile -> Color -- the text color of a tile
-tileTextColor tile = case tile of 
-                  Number n -> if n >= 8 then (rgb 249 246 242) 
+tileTextColor tile = case tile of
+                  Number n -> if n >= 8 then (rgb 249 246 242)
                                 else (rgb 119 110 101)
                   otherwise -> black -- empty tile
 
 tileTextSize : Tile -> Float -- the text size of a tile
-tileTextSize tile = case tile of 
+tileTextSize tile = case tile of
                   Number 128 -> 45
                   Number 256 -> 45
                   Number 512 -> 45
@@ -81,17 +63,15 @@ tileTextStyle tile = {
                 }
 
 displayTile : Tile -> Element -- display a tile
-displayTile tile = let tileBackground = filled (tileColor tile) 
+displayTile tile = let tileBackground = filled (tileColor tile)
                                         <| square tileSize
-                in case tile of 
-                    Number n -> collage (round tileSize) (round tileSize) 
-                       [ 
-                         tileBackground -- the tile background
-                       , toForm <| centered  -- and the number
-                                <| style (tileTextStyle tile) 
-                                <| toText <| show n
+                in case tile of
+                    Number n -> collage (round tileSize) (round tileSize)
+                       [
+                         tileBackground
+                       , toForm (show n)
                        ]
-                    Empty -> collage (round tileSize) (round tileSize) 
+                    Empty -> collage (round tileSize) (round tileSize)
                        [ tileBackground ] -- just the background
 
 {------------------------------------------------------------------------------
@@ -99,11 +79,11 @@ displayTile tile = let tileBackground = filled (tileColor tile)
 ------------------------------------------------------------------------------}
 
 displayTileAtCoordinates : (Tile, Int, Int) -> Form
-displayTileAtCoordinates (t,i,j) = let position = 
+displayTileAtCoordinates (t,i,j) = let position =
                         (
-                          (tileSize + tileMargin) 
+                          (tileSize + tileMargin)
                              * (toFloat i - (toFloat gridSize - 1)/2)
-                        , (-1) * (tileSize + tileMargin) 
+                        , (-1) * (tileSize + tileMargin)
                              * (toFloat j - (toFloat gridSize - 1)/2)
                         )
                     in move position <| toForm <| displayTile t
@@ -115,7 +95,7 @@ displayGrid : Grid -> Element -- display a grid
 displayGrid g = let
                     gridBox = filled (rgb 187 173 160) -- the grid background
                                 <| square gridWidth
-                    tiles = map displayTileAtCoordinates 
+                    tiles = List.map displayTileAtCoordinates
                         <| tilesWithCoordinates g
     in collage (round gridWidth) (round gridWidth) ([gridBox] ++ tiles)
 
@@ -123,12 +103,12 @@ displayGrid g = let
                          Displaying overlay messages
 ------------------------------------------------------------------------------}
 
-displayOverlay : Style -> Color -> String ->  Element -- display an overlay 
+displayOverlay : Style -> Color -> String ->  Element -- display an overlay
                                                       -- with a message
 displayOverlay s c t = collage (round gridWidth) (round gridWidth)
-    [ 
+    [
       filled c <| square gridWidth -- background
-    , toForm <| centered <| style s <| toText t -- message
+    , toForm (show t) -- message
     ]
 
 gameOverOverlayStyle : Style
@@ -150,13 +130,13 @@ wonMessage : String
 wonMessage = "You won!"
 
 displayGameOverOverlay : Element -- display a game over overlay
-displayGameOverOverlay = displayOverlay 
+displayGameOverOverlay = displayOverlay
                             gameOverOverlayStyle
                             gameOverOverlayColor
                             gameOverMessage
 
 displayWonOverlay : Element -- display a game won overlay
-displayWonOverlay = displayOverlay 
+displayWonOverlay = displayOverlay
                             wonOverlayStyle
                             wonOverlayColor
                             wonMessage
@@ -176,5 +156,5 @@ display : GameState -> Element -- display a gamestate
 display gameState = (case gameState.gameProgress of
                         GameOver -> applyOverlay displayGameOverOverlay
                         Won -> applyOverlay displayWonOverlay
-                        otherwise -> id)
+                        otherwise -> identity)
                     <| displayGrid gameState.grid

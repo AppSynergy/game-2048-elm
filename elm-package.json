@@ -1,0 +1,15 @@
+{
+    "version": "1.0.0",
+    "summary": "A clone of 2048 using FRP in elm.",
+    "repository": "https://github.com/AppSynergy/game-2048-elm.git",
+    "license": "MIT",
+    "source-directories": [
+        "src"
+    ],
+    "exposed-modules": [],
+    "dependencies": {
+        "circuithub/elm-list-extra": "3.9.0 <= v < 4.0.0",
+        "elm-lang/core": "3.0.0 <= v < 4.0.0"
+    },
+    "elm-version": "0.16.0 <= v < 0.17.0"
+}

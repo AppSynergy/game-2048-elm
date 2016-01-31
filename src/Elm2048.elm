@@ -12,10 +12,10 @@ All other rights reserved.
 
 module Elm2048 where
 
-import InputModel (Input, Controls, playerDirection, randomFloats)
-import GameModel (defaultGame, GameState)
-import Logic (stepGame)
-import Rendering (display)
+import InputModel exposing (Input, Controls, playerDirection, randomFloats)
+import GameModel exposing (defaultGame, GameState)
+import Logic exposing (stepGame)
+import Rendering exposing (display)
 
 {------------------------------------------------------------------------------
                                Ports and Inputs
