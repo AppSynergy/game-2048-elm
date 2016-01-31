@@ -49,9 +49,9 @@ slideGrid dir grid =
   else
     let
       rotatedGrid = (case dir of
-        Down -> rotateGrid
-        Right -> rotateGrid >> rotateGrid
-        Up -> rotateGrid >> rotateGrid >> rotateGrid
+        Down -> Grid.rotate
+        Right -> Grid.rotate >> Grid.rotate
+        Up -> Grid.rotate >> Grid.rotate >> Grid.rotate
         otherwise -> identity)
         <| grid
 
@@ -61,9 +61,9 @@ slideGrid dir grid =
       scoreGained = List.sum <| List.map (snd) rowsWithScores
 
       slidGrid = (case dir of
-        Up -> rotateGrid
-        Right -> rotateGrid >> rotateGrid
-        Down -> rotateGrid >> rotateGrid >> rotateGrid
+        Up -> Grid.rotate
+        Right -> Grid.rotate >> Grid.rotate
+        Down -> Grid.rotate >> Grid.rotate >> Grid.rotate
         otherwise -> identity)
         <| slidRotatedGrid
 
@@ -139,7 +139,7 @@ emptyTiles : Grid -> List (Int, Int)
 emptyTiles g =
   List.map (\(_,i,j) -> (i,j))
     <| List.filter (\(t,_,_) -> t == Empty)
-    <| tilesWithCoordinates g
+    <| Tile.withCoordinates g
 
 
 -- based on a float that will be random
@@ -168,7 +168,7 @@ placeRandomTile float1 float2 gameState =
       gameState
     else
       { gameState
-      | grid = setTile
+      | grid = Tile.set
         (Maybe.withDefault (0,0) tileIndex)
         gameState.grid
         (newTile float2)

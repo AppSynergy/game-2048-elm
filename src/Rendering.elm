@@ -101,7 +101,7 @@ displayGrid g =
     gridBox = filled (rgb 187 173 160) -- the grid background
       <| square gridWidth
     tiles = List.map displayTileAtCoordinates
-      <| tilesWithCoordinates g
+      <| Tile.withCoordinates g
   in
   collage (round gridWidth) (round gridWidth) ([gridBox] ++ tiles)
 
