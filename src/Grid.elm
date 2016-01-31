@@ -2,7 +2,7 @@ module Grid where
 
 import List.Extra as List2
 import Graphics.Collage as Draw
-import Graphics.Element as Element
+import Graphics.Element as Ele
 import Color
 
 -- MODEL
@@ -30,7 +30,7 @@ rotate grid =
 
 -- VIEW
 
-draw : AbstractGrid a -> List Draw.Form -> Float -> Element.Element
+draw : AbstractGrid a -> List Draw.Form -> Float -> Ele.Element
 draw grid aDraw aWidth =
   let
     background = Draw.square aWidth

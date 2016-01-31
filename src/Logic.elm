@@ -30,16 +30,24 @@ groupedByTwo l =
 -- slides list of tiles to left, merging tiles where necessary
 -- returning a full list of four tiles, and points gained
 slideRow : List Tile -> (List Tile, Int)
-slideRow r = let grouped =
-  groupedByTwo <| List.filter (\t -> t /= Empty) r
-    in (
-        List.take Grid.size
-        <| (List.map ( Tile.fromInt << List.sum << (List.map Tile.toInt)) grouped)
-            ++ List.repeat Grid.size Empty
-      , List.sum << (List.map Tile.toInt)
-        <| List.concat
-        <| List.filter (\x -> List.length x > 1) grouped
-    )
+slideRow row =
+  let
+    emptyRow =
+      List.repeat Grid.size Empty
+    grouped =
+      row
+        |> List.filter (\x -> x /= Empty)
+        |> groupedByTwo
+  in
+  ( List.take Grid.size
+    <| (List.map ( Tile.fromInt << List.sum << (List.map Tile.toInt)) grouped)
+      ++ emptyRow
+  , grouped
+    |> List.filter (\x -> List.length x > 1)
+    >> List.concat
+    |> List.map (Tile.toInt)
+    >> List.sum
+  )
 
 
 slideGrid : Direction -> Grid -> (Grid, Int)
@@ -107,44 +115,6 @@ gameWon : Grid -> Bool
 gameWon g =
   0 /= (List.length <| List.filter (\t -> t == Number 2048) <| List.concat g)
 
-
-lose : Game.State -> Game.State
-lose state =
-  { state
-  | progress = GameOver
-  }
-
-
-win : Game.State -> Game.State
-win state =
-  { state
-  | progress = Won
-  }
-
-
--- a list of the coordinates of the empty tiles in a grid
-emptyTiles : Grid -> List (Int, Int)
-emptyTiles g =
-  List.map (\(_,i,j) -> (i,j))
-    <| List.filter (\(t,_,_) -> t == Empty)
-    <| Tile.withCoordinates g
-
-
--- based on a float that will be random
--- return Just the coordinates of an empty tile in a
--- grid if one exists, or Nothing if there are none
-newTileIndex : Float -> Grid -> Maybe (Int, Int)
-newTileIndex x g =
-    let
-      emptyTileIndices = emptyTiles g
-    in
-    case emptyTileIndices of
-      [] ->
-        Nothing
-      _ ->
-        Just
-          (Maybe.withDefault (0,0) (getAt emptyTileIndices
-           (floor <| (toFloat <| List.length emptyTileIndices) * x)))
 
 
 placeRandomTile : Float -> Float -> Game.State -> Game.State

@@ -101,17 +101,3 @@ displayTileAtCoordinates (t,i,j) =
     )
   in
   Draw.move position <| Draw.toForm <| displayTile t
-
-
-
-applyOverlay : Element -> Element -> Element
-applyOverlay overlay grid =
-  Draw.collage (round gridWidth) (round gridWidth)
-    [ Draw.toForm <| grid
-    , Draw.toForm <| overlay
-    ]
-
-
-drawTiles grid =
-  Tile.withCoordinates grid
-    |> List.map displayTileAtCoordinates

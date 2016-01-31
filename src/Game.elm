@@ -1,12 +1,12 @@
 module Game where
 
-import Rendering exposing (..)
+import Rendering exposing (gridWidth,displayTileAtCoordinates)
 import Tile exposing (Tile, Grid)
 import Grid
 import Overlay
 
-import Graphics.Element as Element
-
+import Graphics.Element as Ele
+import Graphics.Collage as Draw
 
 -- MODEL
 
@@ -30,20 +30,48 @@ default =
   , progress = InProgress
   }
 
+
 -- UPDATE
+
+lose : State -> State
+lose state =
+  { state
+  | progress = GameOver
+  }
+
+
+win : State -> State
+win state =
+  { state
+  | progress = Won
+  }
 
 
 -- VIEW
 
-view : State -> Element.Element
+view : State -> Ele.Element
 view state =
   let overlayer =
     case state.progress of
       GameOver ->
-        applyOverlay (Overlay.view "GameOver")
+        applyOverlay (Overlay.view "Game Over")
       Won ->
         applyOverlay (Overlay.view "You Won!")
       _ ->
         identity
   in
   overlayer (Grid.draw state.grid (drawTiles state.grid) gridWidth)
+
+
+applyOverlay : Ele.Element -> Ele.Element -> Ele.Element
+applyOverlay overlay grid =
+  Draw.collage (round gridWidth) (round gridWidth)
+    [ Draw.toForm grid
+    , Draw.toForm overlay
+    ]
+
+
+drawTiles : Grid -> List Draw.Form
+drawTiles grid =
+  Tile.withCoordinates grid
+    |> List.map Rendering.displayTileAtCoordinates

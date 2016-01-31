@@ -23,13 +23,9 @@ emptyGrid =
     |> List.repeat Grid.size
 
 
-tile2Probability : Float
-tile2Probability = 0.9
-
-
 newTile : Float -> Tile
 newTile x =
-  if (x < tile2Probability) then
+  if (x < 0.9) then
     (Number 2)
   else
     (Number 4)
@@ -50,6 +46,31 @@ fromInt n = case n of
 
 
 -- UPDATE
+
+-- based on a float that will be random
+-- return Just the coordinates of an empty tile in a
+-- grid if one exists, or Nothing if there are none
+newTileIndex : Float -> Grid -> Maybe (Int, Int)
+newTileIndex x g =
+    let
+      emptyTileIndices = emptyTiles g
+    in
+    case emptyTileIndices of
+      [] ->
+        Nothing
+      _ ->
+        Just
+          (Maybe.withDefault (0,0) (getAt emptyTileIndices
+           (floor <| (toFloat <| List.length emptyTileIndices) * x)))
+
+
+-- a list of the coordinates of the empty tiles in a grid
+emptyTiles : Grid -> List (Int, Int)
+emptyTiles g =
+  List.map (\(_,i,j) -> (i,j))
+    <| List.filter (\(t,_,_) -> t == Empty)
+    <| withCoordinates g
+
 
 set : (Int, Int) -> Grid -> Tile -> Grid
 set (i, j) g t =
