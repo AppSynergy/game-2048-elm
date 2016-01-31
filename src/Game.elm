@@ -40,9 +40,9 @@ view state =
   let overlayer =
     case state.progress of
       GameOver ->
-        applyOverlay Overlay.viewGameOver
+        applyOverlay (Overlay.view "GameOver")
       Won ->
-        applyOverlay Overlay.viewWon
+        applyOverlay (Overlay.view "You Won!")
       _ ->
         identity
   in

@@ -1,45 +1,40 @@
 module Overlay where
 
-import Rendering exposing (gridWidth, tileTextStyle)
+import Rendering exposing (gridWidth)
 import Tile
 
 import Graphics.Collage as Draw
 import Graphics.Element as Ele
-import Color exposing (Color)
-import Text exposing (Style)
+import Color
+import Text
 
 
-gameOverOverlayStyle : Style
-gameOverOverlayStyle =
-  tileTextStyle <| Tile.Number 2
+-- MODEL
+
+style : Text.Style
+style =
+  { typeface = [ "Helvetica Neue", "Arial", "sans-serif" ]
+  , height = Just 55.0
+  , color = Color.white
+  , bold = True
+  , italic = False
+  , line = Nothing
+  }
 
 
-wonOverlayStyle : Style
-wonOverlayStyle =
-  tileTextStyle <| Tile.Number 16
+-- VIEW
 
-
-themeColors =
-  { overlayText = Color.rgba 237 194 46 0.5 }
-
-
-viewGameOver : Ele.Element
-viewGameOver =
-  "Game over!"
-    |> view gameOverOverlayStyle themeColors.overlayText
-
-
-viewWon : Ele.Element
-viewWon =
-  "You won!"
-    |> view wonOverlayStyle themeColors.overlayText
-
-
-view : Style -> Color -> String ->  Ele.Element
-view style color string =
+view : String -> Ele.Element
+view string =
+  let
+    backgroundColor = Color.rgba 237 194 46 0.5
+  in
   Draw.collage (round gridWidth) (round gridWidth)
-    [
-      Draw.square gridWidth
-        |> Draw.filled color
-    , Draw.toForm (Ele.show string)
+    [ Draw.square gridWidth
+      |> Draw.filled backgroundColor
+    , string
+      |> Text.fromString
+      |> Text.style style
+      >> Ele.centered
+      >> Draw.toForm
     ]
