@@ -48,7 +48,7 @@ playerDirection =
 -- changes every time signal s changes
 randomFloats : Signal a -> Signal (List Float)
 --randomFloats s = floatList <| Signal.sampleOn s <| Signal.constant 4
-randomFloats s = Signal.constant [0.65, 0.78]
+randomFloats s = Signal.constant [0.65, 0.78, 0.72, 0.13, 0.82]
 
 floatList : Random.Generator (List Float)
 floatList =

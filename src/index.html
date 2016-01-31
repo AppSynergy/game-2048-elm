@@ -6,20 +6,20 @@
         <script type="text/javascript" src="Elm2048.js"></script>
         <style>
 body {
-    background-color: #FAF8EF; 
-    color: #776E65; 
+    background-color: #FAF8EF;
+    color: #776E65;
     font-family: 'Clear Sans','Helvetica Neue',Arial,sans-serif;
 }
 
 #container {
-    width: 500px; 
-    margin: 0px auto; 
+    width: 500px;
+    margin: 0px auto;
 }
 
 h1 {
-    font-size: 70px; 
-    font-weight: bold; 
-    margin: 0px; 
+    font-size: 70px;
+    font-weight: bold;
+    margin: 0px;
     float: left;
     padding-top: 10px;
     padding-bottom: 10px;
@@ -31,24 +31,24 @@ h1 {
 }
 
 #sideBits #scoreContainer {
-    text-align: center; 
-    width: 100px; 
-    background-color: #BBADA0; 
-    color: #FFF; 
-    border-radius: 5px; 
-    padding: 10px; 
+    text-align: center;
+    width: 100px;
+    background-color: #BBADA0;
+    color: #FFF;
+    border-radius: 5px;
+    padding: 10px;
     margin-top: 20px;
 }
 
 #sideBits #newGameButton {
-    text-align: center; 
-    background-color:#8F7A66; 
-    color: #FFF; 
-    border-radius: 5px; 
-    padding: 10px; 
-    margin-top: 10px; 
-    width: 100px; 
-    cursor: pointer; 
+    text-align: center;
+    background-color:#8F7A66;
+    color: #FFF;
+    border-radius: 5px;
+    padding: 10px;
+    margin-top: 10px;
+    width: 100px;
+    cursor: pointer;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -63,9 +63,9 @@ p#description {
 }
 
 #gameBoard {
-    width: 500px; 
-    height: 500px; 
-    margin-top: 20px; 
+    width: 500px;
+    height: 500px;
+    margin-top: 20px;
     clear: both;
 }
         </style>
@@ -84,18 +84,23 @@ p#description {
         </div>
     </body>
     <script type="text/javascript">
-        document.addEventListener("keydown", function (e) { // Prevent arrow keys from scrolling page
+        document.addEventListener("keydown", function (e) {
+          // Prevent arrow keys from scrolling page
           if([37,38,39,40].indexOf(e.keyCode) > -1){
             e.preventDefault();
           }
         }, false);
 
-        var gameBoardDiv = document.getElementById('gameBoard'); // The placeholder div that will accept our elm component
-        var elm2048 = Elm.embed(Elm.Elm2048, gameBoardDiv, { newGameButton: false }); // Set up our elm component in the game board div 
-                                                                                      // The new game button is not pressed by default
+        var gameBoardDiv = document.getElementById('gameBoard');
+          // The placeholder div that will accept our elm component
+        var elm2048 = Elm.embed(Elm.Elm2048, gameBoardDiv, { newGameButton: false });
+          // Set up our elm component in the game board div
+          // The new game button is not pressed by default (????)
 
-        elm2048.ports.score.subscribe(function (x) { // Every time the score port in the elm component changes:
-            document.getElementById('score').innerHTML=x; // modify the score displayed in the score box
+        elm2048.ports.score.subscribe(function (x) {
+          // Every time the score port in the elm component changes:
+          document.getElementById('score').innerHTML=x;
+          // modify the score displayed in the score box
         });
 
         function sendNewGame(a) { // A function to send the boolean status of the new game button to the elm component via its newGameButton port.

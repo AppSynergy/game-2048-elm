@@ -1,15 +1,3 @@
-{--
-2048-elm
-
-Elm2048.elm
-
-Copyright (c) 2014 Josh Kirklin
-
-This source is subject to the MIT License.
-Please see the LICENSE file for more information.
-All other rights reserved.
---}
-
 module Elm2048 where
 
 import InputModel exposing (Input, Controls, playerDirection, randomFloats)
@@ -17,25 +5,36 @@ import GameModel exposing (defaultGame, GameState)
 import Logic exposing (stepGame)
 import Rendering exposing (display)
 
-{------------------------------------------------------------------------------
-                               Ports and Inputs
-------------------------------------------------------------------------------}
 
-port score : Signal Int -- Outgoing score port
-port score = (\x -> x.score) <~ gameState
+-- Outgoing Ports
 
-port newGameButton : Signal Bool -- Incoming new game button port
+port score : Signal Int
+port score =
+  Signal.map (\x -> x.score) gameState
 
-controls = Controls <~ playerDirection ~ newGameButton -- set up controls
-input =  Input <~ controls ~ (randomFloats controls) -- set up input
 
-{------------------------------------------------------------------------------
-                        Gamestate folding and display
-------------------------------------------------------------------------------}
+-- Incoming Ports
+
+port newGameButton : Signal Bool
+
+
+-- Signals
+
+controls =
+  Signal.map2 (\a b -> { newGameButtonPressed=b, tilePushDirection=a }) playerDirection newGameButton
+
+
+input =
+  let
+    i = (\a b -> { controls=a, randomFloats=b })
+  in
+  Signal.map2 i controls (randomFloats controls)
+
 
 gameState : Signal GameState
-gameState = foldp stepGame defaultGame input -- fold the input into the game 
-                                             -- state, starting with the 
-                                             -- default game state
+gameState =
+  Signal.foldp stepGame defaultGame input
 
-main = display <~ gameState -- display the game
+
+main =
+  Signal.map display gameState
