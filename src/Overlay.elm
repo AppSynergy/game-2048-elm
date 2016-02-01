@@ -1,7 +1,6 @@
 module Overlay where
 
-import Rendering exposing (gridWidth)
-import Tile
+import Tile exposing (gridWidth)
 
 import Graphics.Collage as Draw
 import Graphics.Element as Ele

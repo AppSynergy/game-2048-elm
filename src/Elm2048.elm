@@ -5,7 +5,6 @@ import Graphics.Element as Ele
 import Input exposing (Input, Controls, playerDirection, randomFloats)
 import Game
 import Logic exposing (stepGame)
-import Rendering
 
 
 -- PORTS
@@ -16,6 +15,7 @@ port score =
 
 
 port newGameButton : Signal Bool
+--newGameButton = Signal.constant True
 
 
 -- SIGNALS

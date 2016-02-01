@@ -1,9 +1,12 @@
 module Tile where
 
-import List.Extra exposing (getAt)
-
 import Grid
 
+import List.Extra exposing (getAt)
+import Graphics.Element as Ele
+import Graphics.Collage as Draw
+import Color
+import Text exposing (Style)
 
 -- MODEL
 
@@ -23,13 +26,20 @@ emptyGrid =
     |> List.repeat Grid.size
 
 
-newTile : Float -> Tile
-newTile x =
+init : Float -> Tile
+init x =
   if (x < 0.9) then
     (Number 2)
   else
     (Number 4)
 
+
+tileSize : Float
+tileSize = 106.25
+
+
+tileMargin : Float
+tileMargin = 15
 
 -- UTILS
 
@@ -96,3 +106,93 @@ withCoordinates grid =
     ycoords = [0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3]
   in
   List.map3 (,,) flat xcoords ycoords
+
+
+-- VIEW
+
+displayTile : Tile -> Ele.Element
+displayTile tile =
+  let
+    tileSize' = round tileSize
+    tileBackground = Draw.square tileSize
+      |> Draw.filled (tileColor tile)
+    forms =
+      case tile of
+        Number n ->
+          [ tileBackground
+          , n
+            |> toString
+            |> Text.fromString
+            |> Text.style (tileTextStyle tile)
+            |> Ele.centered
+            |> Draw.toForm
+          ]
+        Empty ->
+          [ tileBackground ]
+  in
+  Draw.collage tileSize' tileSize' forms
+
+
+displayTileAtCoordinates : (Tile, Int, Int) -> Draw.Form
+displayTileAtCoordinates (t,i,j) =
+  let position =
+    ( (tileSize + tileMargin) * (toFloat i - (toFloat Grid.size - 1)/2)
+    , (-1) * (tileSize + tileMargin) * (toFloat j - (toFloat Grid.size - 1)/2)
+    )
+  in
+  Draw.move position <| Draw.toForm <| displayTile t
+
+
+
+gridWidth =
+  Grid.width tileSize tileMargin
+
+
+tileColor : Tile -> Color.Color
+tileColor tile =
+  case tile of
+    Number 2 -> Color.rgb 238 228 218
+    Number 4 -> Color.rgb 237 224 200
+    Number 8 -> Color.rgb 242 177 121
+    Number 16 -> Color.rgb 245 149 99
+    Number 32 -> Color.rgb 246 124 95
+    Number 64 -> Color.rgb 246 94 59
+    Number 128 -> Color.rgb 237 207 114
+    Number 256 -> Color.rgb 237 204 97
+    Number 512 -> Color.rgb 237 200 80
+    Number 1024 -> Color.rgb 237 197 63
+    Number 2048 -> Color.rgb 237 194 46
+    _ -> Color.rgba 238 228 218 0.35
+
+
+tileTextColor : Tile -> Color.Color
+tileTextColor tile =
+  case tile of
+    Number n ->
+      if n >= 8 then
+        (Color.rgb 249 246 242)
+      else
+        (Color.rgb 119 110 101)
+    _ -> Color.black
+
+
+tileTextSize : Tile -> Float
+tileTextSize tile =
+  case tile of
+    Number 128 -> 45
+    Number 256 -> 45
+    Number 512 -> 45
+    Number 1024 -> 35
+    Number 2048 -> 35
+    _ -> 55
+
+
+tileTextStyle : Tile -> Style
+tileTextStyle tile =
+  { typeface = [ "Helvetica Neue", "Arial", "sans-serif" ]
+  , height = Just (tileTextSize tile)
+  , color = tileTextColor tile
+  , bold = True
+  , italic = False
+  , line = Nothing
+  }

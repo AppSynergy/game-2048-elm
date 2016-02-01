@@ -2,8 +2,8 @@ module Logic where
 
 import List.Extra exposing (getAt)
 
-import Input exposing (..)
-import Game exposing (..)
+import Input exposing (Input)
+import Game exposing (win, lose, Progress)
 import Grid
 import Tile exposing (..)
 
@@ -50,16 +50,16 @@ slideRow row =
   )
 
 
-slideGrid : Direction -> Grid -> (Grid, Int)
+slideGrid : Input.Direction -> Grid -> (Grid, Int)
 slideGrid dir grid =
-  if (dir == None) then
+  if (dir == Input.None) then
     (grid,0)
   else
     let
       rotatedGrid = (case dir of
-        Down -> Grid.rotate
-        Right -> Grid.rotate >> Grid.rotate
-        Up -> Grid.rotate >> Grid.rotate >> Grid.rotate
+        Input.Down -> Grid.rotate
+        Input.Right -> Grid.rotate >> Grid.rotate
+        Input.Up -> Grid.rotate >> Grid.rotate >> Grid.rotate
         otherwise -> identity)
         <| grid
 
@@ -69,9 +69,9 @@ slideGrid dir grid =
       scoreGained = List.sum <| List.map (snd) rowsWithScores
 
       slidGrid = (case dir of
-        Up -> Grid.rotate
-        Right -> Grid.rotate >> Grid.rotate
-        Down -> Grid.rotate >> Grid.rotate >> Grid.rotate
+        Input.Up -> Grid.rotate
+        Input.Right -> Grid.rotate >> Grid.rotate
+        Input.Down -> Grid.rotate >> Grid.rotate >> Grid.rotate
         otherwise -> identity)
         <| slidRotatedGrid
 
@@ -96,10 +96,10 @@ slideGameState input state =
 gameLost : Grid -> Bool
 gameLost g =
     let
-      up = fst <| slideGrid Up g
-      down = fst <| slideGrid Down g
-      left = fst <| slideGrid Left g
-      right = fst <| slideGrid Right g
+      up = fst <| slideGrid Input.Up g
+      down = fst <| slideGrid Input.Down g
+      left = fst <| slideGrid Input.Left g
+      right = fst <| slideGrid Input.Right g
     in
     List.foldl (\x y -> x && y) True
       [ g /= emptyGrid
@@ -129,7 +129,7 @@ placeRandomTile float1 float2 state =
       | grid = Tile.set
         (Maybe.withDefault (0,0) tileIndex)
         state.grid
-        (newTile float2)
+        (Tile.init float2)
       }
 
 
@@ -150,13 +150,13 @@ stepGame : Input -> Game.State -> Game.State
 stepGame input state =
     if input.controls.newGame then
       newGame input
-    else if state.progress /= InProgress then -- can probably go due to else
+    else if state.progress /= Game.InProgress then -- can probably go due to else
       state
     else if gameWon state.grid then
       win state
     else if gameLost state.grid then
       lose state
-    else if input.controls.push /= None then
+    else if input.controls.push /= Input.None then
       let
         pushedState = slideGameState input state
       in

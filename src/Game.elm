@@ -1,7 +1,6 @@
 module Game where
 
-import Rendering exposing (gridWidth,displayTileAtCoordinates)
-import Tile exposing (Tile, Grid)
+import Tile exposing (Tile, Grid,gridWidth,displayTileAtCoordinates)
 import Grid
 import Overlay
 
@@ -74,4 +73,4 @@ applyOverlay overlay grid =
 drawTiles : Grid -> List Draw.Form
 drawTiles grid =
   Tile.withCoordinates grid
-    |> List.map Rendering.displayTileAtCoordinates
+    |> List.map Tile.displayTileAtCoordinates
