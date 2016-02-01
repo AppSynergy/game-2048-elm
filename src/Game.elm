@@ -2,7 +2,7 @@ module Game where
 
 import Tile exposing (Tile, Grid)
 import Grid
-import Overlay
+import Overlay exposing (Overlay)
 import Logic
 import Input exposing (Input)
 
@@ -76,24 +76,20 @@ update input state =
 
 view : State -> Ele.Element
 view state =
-  let overlayer =
-    case state.progress of
-      GameOver ->
-        applyOverlay (Overlay.view "Game Over")
-      Won ->
-        applyOverlay (Overlay.view "You Won!")
-      _ ->
-        identity
+  let
+    drawOverlay =
+      case state.progress of
+        GameOver ->
+          Overlay.draw (Overlay.Message "Game Over")
+        Won ->
+          Overlay.draw (Overlay.Message "You Won!")
+        _ ->
+          Overlay.draw Overlay.None
+    drawGrid =
+      Grid.draw state.grid (drawTiles state.grid)
   in
-  overlayer (Grid.draw state.grid (drawTiles state.grid) Grid.width)
-
-
-applyOverlay : Ele.Element -> Ele.Element -> Ele.Element
-applyOverlay overlay grid =
-  Draw.collage (round Grid.width) (round Grid.width)
-    [ Draw.toForm grid
-    , Draw.toForm overlay
-    ]
+  [drawGrid, drawOverlay]
+    |> Draw.collage (round Grid.width) (round Grid.width)
 
 
 drawTiles : Grid -> List Draw.Form

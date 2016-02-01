@@ -10,6 +10,11 @@ import Text
 
 -- MODEL
 
+type Overlay
+  = Message String
+  | None
+
+
 style : Text.Style
 style =
   { typeface = [ "Helvetica Neue", "Arial", "sans-serif" ]
@@ -23,17 +28,25 @@ style =
 
 -- VIEW
 
-view : String -> Ele.Element
-view string =
+draw : Overlay -> Draw.Form
+draw overlay =
   let
-    backgroundColor = Color.rgba 237 194 46 0.5
+    backgroundColor =
+      Color.rgba 237 194 46 0.5
+    background =
+      Draw.square Grid.width
+        |> Draw.filled backgroundColor
+    forms =
+      case overlay of
+        Message str ->
+          [ background
+          , str
+            |> Text.fromString
+            |> Text.style style
+            >> Ele.centered
+            >> Draw.toForm
+          ]
+        None ->
+          []
   in
-  Draw.collage (round Grid.width) (round Grid.width)
-    [ Draw.square Grid.width
-      |> Draw.filled backgroundColor
-    , string
-      |> Text.fromString
-      |> Text.style style
-      >> Ele.centered
-      >> Draw.toForm
-    ]
+  Draw.group forms

@@ -38,10 +38,11 @@ rotate grid =
 
 -- VIEW
 
-draw : AbstractGrid a -> List Draw.Form -> Float -> Ele.Element
-draw grid aDraw aWidth =
+draw : AbstractGrid a -> List Draw.Form -> Draw.Form
+draw grid tileForms =
   let
-    background = Draw.square aWidth
+    background = Draw.square width
       |> Draw.filled (Color.rgb 187 173 160)
   in
-  Draw.collage (round aWidth) (round aWidth) ([background] ++ aDraw)
+  background :: tileForms
+    |> Draw.group
