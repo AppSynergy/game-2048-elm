@@ -92,7 +92,7 @@ p#description {
 
         var gameBoardDiv = document.getElementById('gameBoard');
           // The placeholder div that will accept our elm component
-        var elm2048 = Elm.embed(Elm.Elm2048, gameBoardDiv, { newGameButton: false });
+        var elm2048 = Elm.embed(Elm.Elm2048, gameBoardDiv, { start: false });
           // Set up our elm component in the game board div
           // The new game button is not pressed by default (????)
 
@@ -102,8 +102,8 @@ p#description {
           // modify the score displayed in the score box
         });
 
-        function sendNewGame(a) { // A function to send the boolean status of the new game button to the elm component via its newGameButton port.
-            elm2048.ports.newGameButton.send(a);
+        function sendNewGame(a) {
+            elm2048.ports.start.send(a);
         }
 
     </script>
