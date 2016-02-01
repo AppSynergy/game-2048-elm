@@ -1,6 +1,6 @@
 module Overlay where
 
-import Tile exposing (gridWidth)
+import Grid
 
 import Graphics.Collage as Draw
 import Graphics.Element as Ele
@@ -28,8 +28,8 @@ view string =
   let
     backgroundColor = Color.rgba 237 194 46 0.5
   in
-  Draw.collage (round gridWidth) (round gridWidth)
-    [ Draw.square gridWidth
+  Draw.collage (round Grid.width) (round Grid.width)
+    [ Draw.square Grid.width
       |> Draw.filled backgroundColor
     , string
       |> Text.fromString

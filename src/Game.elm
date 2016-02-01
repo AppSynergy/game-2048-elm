@@ -1,6 +1,7 @@
 module Game where
 
-import Tile exposing (Tile, Grid,gridWidth,displayTileAtCoordinates)
+import Grid
+import Tile exposing (Tile, Grid,displayTileAtCoordinates)
 import Grid
 import Overlay
 
@@ -59,12 +60,12 @@ view state =
       _ ->
         identity
   in
-  overlayer (Grid.draw state.grid (drawTiles state.grid) gridWidth)
+  overlayer (Grid.draw state.grid (drawTiles state.grid) Grid.width)
 
 
 applyOverlay : Ele.Element -> Ele.Element -> Ele.Element
 applyOverlay overlay grid =
-  Draw.collage (round gridWidth) (round gridWidth)
+  Draw.collage (round Grid.width) (round Grid.width)
     [ Draw.toForm grid
     , Draw.toForm overlay
     ]

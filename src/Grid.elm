@@ -11,9 +11,17 @@ size : Int
 size = 4
 
 
-width : Float -> Float -> Float
-width aSize aMargin =
-  (toFloat size) * aSize + (1 + toFloat size) * aMargin
+tileSize : Float
+tileSize = 106.25
+
+
+tileMargin : Float
+tileMargin = 15
+
+
+width : Float
+width =
+  (toFloat size) * tileSize + (1 + toFloat size) * tileMargin
 
 
 type alias AbstractGrid a =

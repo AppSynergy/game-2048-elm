@@ -34,13 +34,6 @@ init x =
     (Number 4)
 
 
-tileSize : Float
-tileSize = 106.25
-
-
-tileMargin : Float
-tileMargin = 15
-
 -- UTILS
 
 toInt : Tile -> Int
@@ -113,8 +106,8 @@ withCoordinates grid =
 displayTile : Tile -> Ele.Element
 displayTile tile =
   let
-    tileSize' = round tileSize
-    tileBackground = Draw.square tileSize
+    tileSize' = round Grid.tileSize
+    tileBackground = Draw.square Grid.tileSize
       |> Draw.filled (tileColor tile)
     forms =
       case tile of
@@ -136,16 +129,12 @@ displayTile tile =
 displayTileAtCoordinates : (Tile, Int, Int) -> Draw.Form
 displayTileAtCoordinates (t,i,j) =
   let position =
-    ( (tileSize + tileMargin) * (toFloat i - (toFloat Grid.size - 1)/2)
-    , (-1) * (tileSize + tileMargin) * (toFloat j - (toFloat Grid.size - 1)/2)
+    ( (Grid.tileSize + Grid.tileMargin) * (toFloat i - (toFloat Grid.size - 1)/2)
+    , (-1) * (Grid.tileSize + Grid.tileMargin) * (toFloat j - (toFloat Grid.size - 1)/2)
     )
   in
   Draw.move position <| Draw.toForm <| displayTile t
 
-
-
-gridWidth =
-  Grid.width tileSize tileMargin
 
 
 tileColor : Tile -> Color.Color
