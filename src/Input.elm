@@ -1,5 +1,6 @@
 module Input where
 
+import List.Extra as List2
 import Keyboard
 
 
@@ -23,6 +24,14 @@ type alias Input =
   { controls: Controls
   , randomFloats: List Float
   }
+
+
+-- UPDATE
+
+fetchRandom : Input -> Int -> Float
+fetchRandom input index =
+  List2.getAt input.randomFloats index
+    |> Maybe.withDefault 0
 
 
 -- SIGNALS

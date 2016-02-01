@@ -5,7 +5,6 @@ import Graphics.Element as Ele
 import Input exposing (Input)
 import Game
 import Randomize
-import Logic exposing (stepGame)
 
 
 -- PORTS
@@ -33,7 +32,7 @@ input =
 
 gameState : Signal Game.State
 gameState =
-  Signal.foldp stepGame Game.default input
+  Signal.foldp Game.update Game.init input
 
 
 main : Signal Ele.Element

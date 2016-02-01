@@ -3,7 +3,6 @@ module Logic where
 import List.Extra exposing (getAt)
 
 import Input exposing (Input)
-import Game exposing (win, lose, Progress)
 import Grid
 import Tile exposing (..)
 
@@ -78,18 +77,6 @@ slideGrid dir grid =
     in (slidGrid, scoreGained)
 
 
-slideGameState : Input -> Game.State -> Game.State
-slideGameState input state =
-  let
-    newGridScore = slideGrid input.controls.push state.grid
-  in
-  if (fst newGridScore == state.grid) then
-    state
-  else
-    { state
-    | grid = fst newGridScore
-    , score = state.score + snd newGridScore
-    }
 
 
 -- If you can't slide, you've lost!
@@ -114,58 +101,3 @@ gameLost g =
 gameWon : Grid -> Bool
 gameWon g =
   0 /= (List.length <| List.filter (\t -> t == Number 2048) <| List.concat g)
-
-
-
-placeRandomTile : Float -> Float -> Game.State -> Game.State
-placeRandomTile float1 float2 state =
-    let
-      tileIndex = newTileIndex float1 state.grid
-    in
-    if (tileIndex == Nothing) then
-      state
-    else
-      { state
-      | grid = Tile.set
-        (Maybe.withDefault (0,0) tileIndex)
-        state.grid
-        (Tile.init float2)
-      }
-
-
-fetchRandom : Input -> Int -> Float
-fetchRandom input index =
-  getAt input.randomFloats index
-    |> Maybe.withDefault 0
-
-
-newGame : Input -> Game.State
-newGame input =
-  Game.default
-    |> placeRandomTile (fetchRandom input 0) (fetchRandom input 1)
-    |> placeRandomTile (fetchRandom input 2) (fetchRandom input 3)
-
-
-stepGame : Input -> Game.State -> Game.State
-stepGame input state =
-    if input.controls.newGame then
-      newGame input
-    else if state.progress /= Game.InProgress then -- can probably go due to else
-      state
-    else if gameWon state.grid then
-      win state
-    else if gameLost state.grid then
-      lose state
-    else if input.controls.push /= Input.None then
-      let
-        pushedState = slideGameState input state
-      in
-      if (pushedState == state) then
-        state
-      else
-        placeRandomTile
-          (fetchRandom input 0)
-          (fetchRandom input 1)
-          pushedState
-    else
-      state

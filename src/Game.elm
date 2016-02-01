@@ -4,6 +4,8 @@ import Grid
 import Tile exposing (Tile, Grid,displayTileAtCoordinates)
 import Grid
 import Overlay
+import Logic
+import Input exposing (Input, fetchRandom)
 
 import Graphics.Element as Ele
 import Graphics.Collage as Draw
@@ -23,8 +25,8 @@ type alias State =
   }
 
 
-default : State
-default =
+init : State
+init =
   { grid = Tile.emptyGrid
   , score = 0
   , progress = InProgress
@@ -33,19 +35,68 @@ default =
 
 -- UPDATE
 
-lose : State -> State
-lose state =
-  { state
-  | progress = GameOver
-  }
+
+update : Input -> State -> State
+update input state =
+    if input.controls.newGame then
+      newGame input
+    else if state.progress /= InProgress then
+      state
+    else if Logic.gameWon state.grid then
+      { state | progress = Won }
+    else if Logic.gameLost state.grid then
+      { state | progress = GameOver }
+    else if input.controls.push /= Input.None then
+      let
+        pushedState = slideGameState input state
+      in
+      if (pushedState == state) then
+        state
+      else
+        placeRandomTile
+          (fetchRandom input 0)
+          (fetchRandom input 1)
+          pushedState
+    else
+      state
 
 
-win : State -> State
-win state =
-  { state
-  | progress = Won
-  }
+slideGameState : Input -> State -> State
+slideGameState input state =
+  let
+    newGridScore = Logic.slideGrid input.controls.push state.grid
+  in
+  if (fst newGridScore == state.grid) then
+    state
+  else
+    { state
+    | grid = fst newGridScore
+    , score = state.score + snd newGridScore
+    }
 
+
+newGame : Input -> State
+newGame input =
+  init
+    |> placeRandomTile (fetchRandom input 0) (fetchRandom input 1)
+    |> placeRandomTile (fetchRandom input 2) (fetchRandom input 3)
+
+
+
+placeRandomTile : Float -> Float -> State -> State
+placeRandomTile float1 float2 state =
+    let
+      tileIndex = Tile.newTileIndex float1 state.grid
+    in
+    if (tileIndex == Nothing) then
+      state
+    else
+      { state
+      | grid = Tile.set
+        (Maybe.withDefault (0,0) tileIndex)
+        state.grid
+        (Tile.init float2)
+      }
 
 -- VIEW
 
