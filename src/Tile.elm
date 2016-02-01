@@ -116,15 +116,16 @@ withCoordinates grid =
   in
   List.map3 (,,) flat xcoords ycoords
 
+getCoordinates : Tile -> (Int,Int)
+getCoordinates tile =
+  (5,6)
 
 -- VIEW
 
-displayTile : Tile -> Draw.Form
-displayTile tile =
+draw : (Tile, Int, Int) -> Draw.Form
+draw (tile,i,j) =
   let
-    tileSize' = round Grid.tileSize
-    tileBackground = Draw.square Grid.tileSize
-      |> Draw.filled (Tile.Style.color (toInt tile))
+    tileBackground = Grid.background (Tile.Style.color (toInt tile))
     forms =
       case tile of
         Number n ->
@@ -136,13 +137,4 @@ displayTile tile =
           [ tileBackground ]
   in
   Draw.group forms
-
-
-displayTileAtCoordinates : (Tile, Int, Int) -> Draw.Form
-displayTileAtCoordinates (t,i,j) =
-  let position =
-    ( (Grid.tileSize + Grid.tileMargin) * (toFloat i - (toFloat Grid.size - 1)/2)
-    , (-1) * (Grid.tileSize + Grid.tileMargin) * (toFloat j - (toFloat Grid.size - 1)/2)
-    )
-  in
-  Draw.move position <| displayTile t
+    |> Draw.move ((Grid.offset i), negate(Grid.offset j))

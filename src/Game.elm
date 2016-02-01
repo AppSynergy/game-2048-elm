@@ -95,4 +95,4 @@ view state =
 drawTiles : Grid -> List Draw.Form
 drawTiles grid =
   Tile.withCoordinates grid
-    |> List.map Tile.displayTileAtCoordinates
+    |> List.map Tile.draw

@@ -2,30 +2,46 @@ module Grid where
 
 import List.Extra as List2
 import Graphics.Collage as Draw
-import Graphics.Element as Ele
 import Color
+
 
 -- MODEL
 
+type alias AbstractGrid a =
+  List (List a)
+
+
+type alias Dimensions =
+  { size : Int
+  , tile :
+    { width : Float
+    , margin : Float
+    }
+  }
+
+d : Dimensions
+d =
+  { size = 4
+  , tile =
+    { width = 106.25
+    , margin = 15
+    }
+  }
+
+
 size : Int
-size = 4
-
-
-tileSize : Float
-tileSize = 106.25
-
-
-tileMargin : Float
-tileMargin = 15
+size =
+  d.size
 
 
 width : Float
 width =
-  (toFloat size) * tileSize + (1 + toFloat size) * tileMargin
+  (toFloat d.size) * d.tile.width + (1 + toFloat d.size) * d.tile.margin
 
 
-type alias AbstractGrid a =
-  List (List a)
+offset : Int -> Float
+offset x =
+  (d.tile.width + d.tile.margin) * (toFloat x - (toFloat d.size - 1) / 2)
 
 
 -- UPDATE
@@ -40,9 +56,11 @@ rotate grid =
 
 draw : AbstractGrid a -> List Draw.Form -> Draw.Form
 draw grid tileForms =
-  let
-    background = Draw.square width
-      |> Draw.filled (Color.rgb 187 173 160)
-  in
-  background :: tileForms
+  (background (Color.rgb 187 173 160)) :: tileForms
     |> Draw.group
+
+
+background : Color.Color -> Draw.Form
+background color =
+  Draw.square width
+    |> Draw.filled color

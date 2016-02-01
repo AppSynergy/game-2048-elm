@@ -31,15 +31,10 @@ style =
 draw : Overlay -> Draw.Form
 draw overlay =
   let
-    backgroundColor =
-      Color.rgba 237 194 46 0.5
-    background =
-      Draw.square Grid.width
-        |> Draw.filled backgroundColor
     forms =
       case overlay of
         Message str ->
-          [ background
+          [ (Grid.background (Color.rgba 237 194 46 0.5))
           , Utils.textForm style str
           ]
         None ->
