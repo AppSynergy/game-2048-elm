@@ -4,6 +4,8 @@ import Keyboard
 import Random
 
 
+-- MODEL
+
 type Direction = Up | Down | Left | Right | None
 
 
@@ -19,8 +21,10 @@ type alias Input =
   }
 
 
-playerDirection : Signal Direction
-playerDirection =
+-- SIGNALS
+
+move : Signal Direction
+move =
   let toDirection ds  =
     if ds == { x=0, y=1 } then Up
     else if ds == { x=0, y=-1 } then Down
@@ -35,9 +39,9 @@ playerDirection =
 
 -- provides four random floats that will be used for random events.
 -- changes every time signal s changes
-randomFloats : Signal a -> Signal (List Float)
+randomizer : Signal a -> Signal (List Float)
 --randomFloats s = floatList <| Signal.sampleOn s <| Signal.constant 4
-randomFloats s = Signal.constant [0.65, 0.78, 0.72, 0.13, 0.82]
+randomizer s = Signal.constant [0.65, 0.78, 0.72, 0.13, 0.82]
 
 floatList : Random.Generator (List Float)
 floatList =

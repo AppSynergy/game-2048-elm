@@ -2,7 +2,7 @@ module Elm2048 where
 
 import Graphics.Element as Ele
 
-import Input exposing (Input, Controls, playerDirection, randomFloats)
+import Input exposing (Input)
 import Game
 import Logic exposing (stepGame)
 
@@ -14,8 +14,7 @@ port score =
   Signal.map (\x -> x.score) gameState
 
 
-port newGameButton : Signal Bool
---newGameButton = Signal.constant True
+port start : Signal Bool
 
 
 -- SIGNALS
@@ -24,10 +23,11 @@ input : Signal Input
 input =
   let
     controls =
-      Signal.map2 (\a b -> { newGame=b, push=a }) playerDirection newGameButton
-    i = (\a b -> { controls=a, randomFloats=b })
+      Signal.map2 (\a b -> { newGame=b, push=a }) Input.move start
+    i =
+      (\a b -> { controls=a, randomFloats=b })
   in
-  Signal.map2 i controls (randomFloats controls)
+  Signal.map2 i controls (Input.randomizer controls)
 
 
 gameState : Signal Game.State
