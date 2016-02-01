@@ -110,8 +110,11 @@ withCoordinates grid =
   let
     range = [0..(Grid.size-1)]
     flat = List.concat grid
-    xcoords = List.concat (List.repeat Grid.size range)
-    ycoords = [0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3]
+    repeat x = List.repeat Grid.size x
+    xcoords = repeat range
+      |> List.concat
+    ycoords = List.map (\y -> repeat y) range
+      |> List.concat
   in
   List.map3 (,,) flat xcoords ycoords
 
