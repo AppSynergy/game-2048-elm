@@ -139,7 +139,9 @@ newGame input =
     randoms = [0,1,2,3]
       |> List.map (getAt input.randomFloats)
       |> List.map (Maybe.withDefault 0)
-    (i1,i2,i3,i4) = (0, 0.4, 0.6, 0.1)
+    d1 = Debug.log "randoms" randoms
+    (i1,i2,i3,i4) = (0.87, 0.4, 0.6, 0.1)
+    --(i1,i2,i3,i4) = List.foldr (,,,) randoms
   in
     placeRandomTile i1 i2
  <| placeRandomTile i3 i4
