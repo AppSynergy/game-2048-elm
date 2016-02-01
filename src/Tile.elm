@@ -1,12 +1,10 @@
 module Tile where
 
 import Grid
+import Tile.Style
 
 import List.Extra exposing (getAt)
-import Graphics.Element as Ele
 import Graphics.Collage as Draw
-import Color
-import Text exposing (Style)
 import Utils
 
 -- MODEL
@@ -126,13 +124,13 @@ displayTile tile =
   let
     tileSize' = round Grid.tileSize
     tileBackground = Draw.square Grid.tileSize
-      |> Draw.filled (tileColor tile)
+      |> Draw.filled (Tile.Style.color (toInt tile))
     forms =
       case tile of
         Number n ->
           [ tileBackground
           , toString n
-            |> Utils.textForm (tileTextStyle tile)
+            |> Utils.textForm (Tile.Style.text (toInt tile))
           ]
         Empty ->
           [ tileBackground ]
@@ -148,54 +146,3 @@ displayTileAtCoordinates (t,i,j) =
     )
   in
   Draw.move position <| displayTile t
-
-
-
-tileColor : Tile -> Color.Color
-tileColor tile =
-  case tile of
-    Number 2 -> Color.rgb 238 228 218
-    Number 4 -> Color.rgb 237 224 200
-    Number 8 -> Color.rgb 242 177 121
-    Number 16 -> Color.rgb 245 149 99
-    Number 32 -> Color.rgb 246 124 95
-    Number 64 -> Color.rgb 246 94 59
-    Number 128 -> Color.rgb 237 207 114
-    Number 256 -> Color.rgb 237 204 97
-    Number 512 -> Color.rgb 237 200 80
-    Number 1024 -> Color.rgb 237 197 63
-    Number 2048 -> Color.rgb 237 194 46
-    _ -> Color.rgba 238 228 218 0.35
-
-
-tileTextColor : Tile -> Color.Color
-tileTextColor tile =
-  case tile of
-    Number n ->
-      if n >= 8 then
-        (Color.rgb 249 246 242)
-      else
-        (Color.rgb 119 110 101)
-    _ -> Color.black
-
-
-tileTextSize : Tile -> Float
-tileTextSize tile =
-  case tile of
-    Number 128 -> 45
-    Number 256 -> 45
-    Number 512 -> 45
-    Number 1024 -> 35
-    Number 2048 -> 35
-    _ -> 55
-
-
-tileTextStyle : Tile -> Style
-tileTextStyle tile =
-  { typeface = [ "Helvetica Neue", "Arial", "sans-serif" ]
-  , height = Just (tileTextSize tile)
-  , color = tileTextColor tile
-  , bold = True
-  , italic = False
-  , line = Nothing
-  }
