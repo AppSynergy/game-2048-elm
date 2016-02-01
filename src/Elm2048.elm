@@ -4,6 +4,7 @@ import Graphics.Element as Ele
 
 import Input exposing (Input)
 import Game
+import Randomize
 import Logic exposing (stepGame)
 
 
@@ -27,7 +28,7 @@ input =
     i =
       (\a b -> { controls=a, randomFloats=b })
   in
-  Signal.map2 i controls (Input.randomizer controls)
+  Signal.map2 i controls (Randomize.signal controls)
 
 
 gameState : Signal Game.State
