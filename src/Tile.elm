@@ -50,6 +50,20 @@ fromInt n = case n of
 
 -- UPDATE
 
+add : Float -> Float -> Grid -> Grid
+add float1 float2 grid =
+    let
+      tileIndex = newTileIndex float1 grid
+    in
+    if (tileIndex == Nothing) then
+      grid
+    else
+      set
+        (Maybe.withDefault (0,0) tileIndex)
+        (init float2)
+        grid
+
+
 -- based on a float that will be random
 -- return Just the coordinates of an empty tile in a
 -- grid if one exists, or Nothing if there are none
@@ -75,8 +89,8 @@ emptyTiles g =
     <| withCoordinates g
 
 
-set : (Int, Int) -> Grid -> Tile -> Grid
-set (i, j) g t =
+set : (Int, Int) -> Tile -> Grid -> Grid
+set (i, j) t g =
     let
       r = getAt g j -- jth row
       nr = case r of

@@ -1,14 +1,14 @@
 module Game where
 
-import Grid
-import Tile exposing (Tile, Grid,displayTileAtCoordinates)
+import Tile exposing (Tile, Grid)
 import Grid
 import Overlay
 import Logic
-import Input exposing (Input, fetchRandom)
+import Input exposing (Input)
 
 import Graphics.Element as Ele
 import Graphics.Collage as Draw
+
 
 -- MODEL
 
@@ -33,13 +33,21 @@ init =
   }
 
 
--- UPDATE
+init' : Input -> State
+init' input =
+  { init
+  | grid = Tile.emptyGrid
+    |> Tile.add (Input.random input 0) (Input.random input 1)
+    |> Tile.add (Input.random input 2) (Input.random input 3)
+  }
 
+
+-- UPDATE
 
 update : Input -> State -> State
 update input state =
     if input.controls.newGame then
-      newGame input
+      init' input
     else if state.progress /= InProgress then
       state
     else if Logic.gameWon state.grid then
@@ -48,55 +56,21 @@ update input state =
       { state | progress = GameOver }
     else if input.controls.push /= Input.None then
       let
-        pushedState = slideGameState input state
+        (grid,score) = Logic.slideGrid input.controls.push state.grid
       in
-      if (pushedState == state) then
+      if grid == state.grid then
         state
       else
-        placeRandomTile
-          (fetchRandom input 0)
-          (fetchRandom input 1)
-          pushedState
+        { state
+        | grid = Tile.add
+          (Input.random input 0)
+          (Input.random input 1)
+          grid
+        , score = state.score + score
+        }
     else
       state
 
-
-slideGameState : Input -> State -> State
-slideGameState input state =
-  let
-    newGridScore = Logic.slideGrid input.controls.push state.grid
-  in
-  if (fst newGridScore == state.grid) then
-    state
-  else
-    { state
-    | grid = fst newGridScore
-    , score = state.score + snd newGridScore
-    }
-
-
-newGame : Input -> State
-newGame input =
-  init
-    |> placeRandomTile (fetchRandom input 0) (fetchRandom input 1)
-    |> placeRandomTile (fetchRandom input 2) (fetchRandom input 3)
-
-
-
-placeRandomTile : Float -> Float -> State -> State
-placeRandomTile float1 float2 state =
-    let
-      tileIndex = Tile.newTileIndex float1 state.grid
-    in
-    if (tileIndex == Nothing) then
-      state
-    else
-      { state
-      | grid = Tile.set
-        (Maybe.withDefault (0,0) tileIndex)
-        state.grid
-        (Tile.init float2)
-      }
 
 -- VIEW
 

@@ -28,8 +28,8 @@ type alias Input =
 
 -- UPDATE
 
-fetchRandom : Input -> Int -> Float
-fetchRandom input index =
+random : Input -> Int -> Float
+random input index =
   List2.getAt input.randomFloats index
     |> Maybe.withDefault 0
 
