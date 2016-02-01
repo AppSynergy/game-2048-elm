@@ -133,19 +133,17 @@ placeRandomTile float1 float2 state =
       }
 
 
+fetchRandom : Input -> Int -> Float
+fetchRandom input index =
+  getAt input.randomFloats index
+    |> Maybe.withDefault 0
+
+
 newGame : Input -> Game.State
 newGame input =
-  let
-    randoms = [0,1,2,3]
-      |> List.map (getAt input.randomFloats)
-      |> List.map (Maybe.withDefault 0)
-    d1 = Debug.log "randoms" randoms
-    (i1,i2,i3,i4) = (0.87, 0.4, 0.6, 0.1)
-    --(i1,i2,i3,i4) = List.foldr (,,,) randoms
-  in
-    placeRandomTile i1 i2
- <| placeRandomTile i3 i4
- <| Game.default
+  Game.default
+    |> placeRandomTile (fetchRandom input 0) (fetchRandom input 1)
+    |> placeRandomTile (fetchRandom input 2) (fetchRandom input 3)
 
 
 stepGame : Input -> Game.State -> Game.State
@@ -166,8 +164,8 @@ stepGame input state =
         state
       else
         placeRandomTile
-          (Maybe.withDefault 0 (getAt input.randomFloats 0))
-          (Maybe.withDefault 0 (getAt input.randomFloats 1))
+          (fetchRandom input 0)
+          (fetchRandom input 1)
           pushedState
     else
       state
