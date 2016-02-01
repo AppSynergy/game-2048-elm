@@ -4,7 +4,7 @@ import List.Extra exposing (getAt)
 
 import Input exposing (Input)
 import Grid
-import Tile exposing (..)
+import Tile exposing (Tile, Grid)
 
 -- takes a list of values and 'slides' them to the left,
 -- joining in lists pairs of adjacent identical values.
@@ -32,10 +32,10 @@ slideRow : List Tile -> (List Tile, Int)
 slideRow row =
   let
     emptyRow =
-      List.repeat Grid.size Empty
+      List.repeat Grid.size Tile.Empty
     grouped =
       row
-        |> List.filter (\x -> x /= Empty)
+        |> List.filter (\x -> x /= Tile.Empty)
         |> groupedByTwo
   in
   ( List.take Grid.size
@@ -89,7 +89,7 @@ gameLost g =
       right = fst <| slideGrid Input.Right g
     in
     List.foldl (\x y -> x && y) True
-      [ g /= emptyGrid
+      [ g /= Tile.emptyGrid
       , up == down
       , down == left
       , left == right
@@ -100,4 +100,4 @@ gameLost g =
 -- If you've made 2048, you've won!
 gameWon : Grid -> Bool
 gameWon g =
-  0 /= (List.length <| List.filter (\t -> t == Number 2048) <| List.concat g)
+  0 /= (List.length <| List.filter (\t -> t == Tile.Number 2048) <| List.concat g)

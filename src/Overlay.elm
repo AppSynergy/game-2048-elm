@@ -3,9 +3,9 @@ module Overlay where
 import Grid
 
 import Graphics.Collage as Draw
-import Graphics.Element as Ele
 import Color
 import Text
+import Utils
 
 
 -- MODEL
@@ -40,11 +40,7 @@ draw overlay =
       case overlay of
         Message str ->
           [ background
-          , str
-            |> Text.fromString
-            |> Text.style style
-            >> Ele.centered
-            >> Draw.toForm
+          , Utils.textForm style str
           ]
         None ->
           []

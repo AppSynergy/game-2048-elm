@@ -7,6 +7,7 @@ import Graphics.Element as Ele
 import Graphics.Collage as Draw
 import Color
 import Text exposing (Style)
+import Utils
 
 -- MODEL
 
@@ -53,7 +54,7 @@ fromInt n = case n of
 add : Float -> Float -> Grid -> Grid
 add float1 float2 grid =
     let
-      tileIndex = newTileIndex float1 grid
+      tileIndex = findEmpty float1 grid
     in
     if (tileIndex == Nothing) then
       grid
@@ -67,10 +68,10 @@ add float1 float2 grid =
 -- based on a float that will be random
 -- return Just the coordinates of an empty tile in a
 -- grid if one exists, or Nothing if there are none
-newTileIndex : Float -> Grid -> Maybe (Int, Int)
-newTileIndex x g =
+findEmpty : Float -> Grid -> Maybe (Int, Int)
+findEmpty x grid =
     let
-      emptyTileIndices = emptyTiles g
+      emptyTileIndices = emptyTiles grid
     in
     case emptyTileIndices of
       [] ->
@@ -117,7 +118,7 @@ withCoordinates grid =
 
 -- VIEW
 
-displayTile : Tile -> Ele.Element
+displayTile : Tile -> Draw.Form
 displayTile tile =
   let
     tileSize' = round Grid.tileSize
@@ -127,17 +128,13 @@ displayTile tile =
       case tile of
         Number n ->
           [ tileBackground
-          , n
-            |> toString
-            |> Text.fromString
-            |> Text.style (tileTextStyle tile)
-            |> Ele.centered
-            |> Draw.toForm
+          , toString n
+            |> Utils.textForm (tileTextStyle tile)
           ]
         Empty ->
           [ tileBackground ]
   in
-  Draw.collage tileSize' tileSize' forms
+  Draw.group forms
 
 
 displayTileAtCoordinates : (Tile, Int, Int) -> Draw.Form
@@ -147,7 +144,7 @@ displayTileAtCoordinates (t,i,j) =
     , (-1) * (Grid.tileSize + Grid.tileMargin) * (toFloat j - (toFloat Grid.size - 1)/2)
     )
   in
-  Draw.move position <| Draw.toForm <| displayTile t
+  Draw.move position <| displayTile t
 
 
 
